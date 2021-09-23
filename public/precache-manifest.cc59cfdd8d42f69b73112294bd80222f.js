@@ -1,7 +1,7 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a39214f8b9ff7f92c7bf",
-    "url": "/css/app.e32f1ff0.css"
+    "revision": "1e36db9c23a60c9435ee",
+    "url": "/css/app.365cbff1.css"
   },
   {
     "revision": "ad1875518dc96cd41c6e733d3a693dd1",
@@ -16,11 +16,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/Legs and Shoulders.74ad935a.jpg"
   },
   {
-    "revision": "18abfdb7324a16942290fe4dd89b8a5d",
+    "revision": "9aa5dc895f41e383cca37db3c08e488d",
     "url": "/index.html"
   },
   {
-    "revision": "a39214f8b9ff7f92c7bf",
+    "revision": "1e36db9c23a60c9435ee",
     "url": "/js/app.c1663ff5.js"
   },
   {
