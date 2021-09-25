@@ -57,11 +57,13 @@ async function getWorkoutById(req, res) {
 async function saveWorkout(req, res) {
 	try {
 		const { _id } = req.body
+		let workout
 		if (_id) {
-			await workoutService.update(req.body)
+			workout = await workoutService.update(req.body)
 		} else {
-			await workoutService.add(req.body)
+			workout = await workoutService.add(req.body)
 		}
+		res.send(workout)
 	} catch (err) {
 		console.log(err)
 		res.status(500).json({ err })

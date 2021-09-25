@@ -15,5 +15,6 @@ router.get('/move', moveToNextWorkout)
 router.get('/all', getAllWorkouts)
 router.get('/:id', getWorkoutById)
 router.put('/', saveWorkout)
+router.post('/', saveWorkout)
 
 module.exports = router

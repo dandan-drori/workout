@@ -41,13 +41,18 @@ async function getAll() {
 async function getNext() {}
 
 async function moveToNext() {
-	const collection = await dbService.getCollection('currWorkout')
-	const { _id, currWorkoutIdx } = await collection.findOne({})
-	const newCurrWorkoutIdx =
-		currWorkoutIdx === 2
-			? { _id: ObjectId(_id), currWorkoutIdx: 0 }
-			: { _id: ObjectId(_id), currWorkoutIdx: currWorkoutIdx + 1 }
-	await collection.updateOne({ _id: ObjectId(_id) }, { $set: newCurrWorkoutIdx })
+	try {
+		const collection = await dbService.getCollection('currWorkout')
+		const { _id, currWorkoutIdx } = await collection.findOne({})
+		const newCurrWorkoutIdx =
+			currWorkoutIdx === 2
+				? { _id: ObjectId(_id), currWorkoutIdx: 0 }
+				: { _id: ObjectId(_id), currWorkoutIdx: currWorkoutIdx + 1 }
+		await collection.updateOne({ _id: ObjectId(_id) }, { $set: newCurrWorkoutIdx })
+	} catch (err) {
+		console.log(err)
+		throw err
+	}
 }
 
 async function getById(id) {
@@ -78,4 +83,17 @@ async function update(workout) {
 		throw err
 	}
 }
-async function add() {}
+async function add(workout) {
+	try {
+		const workoutToAdd = {
+			name: workout.name,
+			exercises: workout.exercises || [],
+		}
+		const collection = await dbService.getCollection('workout')
+		await collection.insertOne(workout)
+		return workoutToAdd
+	} catch (err) {
+		console.log(err)
+		throw err
+	}
+}
