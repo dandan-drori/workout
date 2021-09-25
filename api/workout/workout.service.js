@@ -66,7 +66,15 @@ async function getById(id) {
 	}
 }
 
-async function remove() {}
+async function remove(id) {
+	try {
+		const collection = await dbService.getCollection('workout')
+		await collection.deleteOne({ _id: ObjectId(id) })
+	} catch (err) {
+		console.log(err)
+		throw err
+	}
+}
 
 async function update(workout) {
 	try {

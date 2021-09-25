@@ -7,6 +7,7 @@ module.exports = {
 	getAllWorkouts,
 	getWorkoutById,
 	saveWorkout,
+	removeWorkout,
 }
 
 async function getCurrentWorkout(req, res) {
@@ -64,6 +65,16 @@ async function saveWorkout(req, res) {
 			workout = await workoutService.add(req.body)
 		}
 		res.send(workout)
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ err })
+	}
+}
+
+async function removeWorkout(req, res) {
+	try {
+		await workoutService.remove(req.params.id)
+		res.send('workout delete successfully')
 	} catch (err) {
 		console.log(err)
 		res.status(500).json({ err })
