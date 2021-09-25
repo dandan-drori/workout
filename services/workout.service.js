@@ -35,8 +35,6 @@ const gWorkoutIdx = 0
 
 module.exports = {
 	getAllWorkouts,
-	getWorkoutByName,
-	getWorkoutByExercise,
 	getCurrentWorkout,
 	getNextWorkout,
 	moveToNextWorkout,
@@ -45,16 +43,6 @@ module.exports = {
 
 function getAllWorkouts() {
 	return gWorkouts
-}
-
-function getWorkoutByName(workoutName) {
-	return gWorkouts.find(({ name }) => name === workoutName)
-}
-
-function getWorkoutByExercise(exercise) {
-	return gWorkouts.find(
-		({ exercises }) => exercises.findIdx(({ name }) => name === exercise) !== -1
-	)
 }
 
 function getCurrentWorkout() {
