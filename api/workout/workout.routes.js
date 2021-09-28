@@ -2,7 +2,6 @@ const router = require('express').Router()
 
 const {
 	getCurrentWorkout,
-	getNextWorkout,
 	moveToNextWorkout,
 	getAllWorkouts,
 	getWorkoutById,
@@ -11,7 +10,6 @@ const {
 } = require('./workout.controller')
 
 router.get('/', getCurrentWorkout)
-router.get('/next', getNextWorkout)
 router.get('/move', moveToNextWorkout)
 router.get('/all', getAllWorkouts)
 router.get('/:id', getWorkoutById)

@@ -1,4 +1,5 @@
 const dbService = require('../../services/db.service')
+const userService = require('../user/user.service')
 const ObjectId = require('mongodb').ObjectId
 
 module.exports = {
@@ -9,16 +10,12 @@ module.exports = {
 	remove,
 	update,
 	add,
-	getNext,
 }
 
-async function getCurrent() {
+async function getCurrent(userId) {
 	try {
-		const currWorkoutCollection = await dbService.getCollection('currWorkout')
-		const { currWorkoutIdx } = await currWorkoutCollection.findOne({})
-		const collection = await dbService.getCollection('workout')
-		const workouts = await collection.find({}).toArray()
-		if (!workouts.length) Promise.reject({ name: 'No workouts', exercises: [] })
+		const { workouts, currWorkoutIdx } = await userService.getById(userId)
+		if (!workouts.length) return { name: 'No Workout', exercises: [] }
 		return workouts[currWorkoutIdx]
 	} catch (err) {
 		console.log(err)
@@ -30,7 +27,7 @@ async function getAll() {
 	try {
 		const collection = await dbService.getCollection('workout')
 		const workouts = collection.find({}).toArray()
-		if (!workouts.length) Promise.reject({ name: 'No workouts', exercises: [] })
+		if (!workouts.length) return [{ name: 'No workouts', exercises: [] }]
 		return workouts
 	} catch (err) {
 		console.log(err)
@@ -38,17 +35,12 @@ async function getAll() {
 	}
 }
 
-async function getNext() {}
-
-async function moveToNext() {
+async function moveToNext(userId) {
 	try {
-		const collection = await dbService.getCollection('currWorkout')
-		const { _id, currWorkoutIdx } = await collection.findOne({})
-		const newCurrWorkoutIdx =
-			currWorkoutIdx === 2
-				? { _id: ObjectId(_id), currWorkoutIdx: 0 }
-				: { _id: ObjectId(_id), currWorkoutIdx: currWorkoutIdx + 1 }
-		await collection.updateOne({ _id: ObjectId(_id) }, { $set: newCurrWorkoutIdx })
+		const user = await userService.getById(userId)
+		const { workouts, currWorkoutIdx } = user
+		user.currWorkoutIdx = currWorkoutIdx === workouts.length - 1 ? 0 : currWorkoutIdx + 1
+		await userService.update(user)
 	} catch (err) {
 		console.log(err)
 		throw err
@@ -68,6 +60,12 @@ async function getById(id) {
 
 async function remove(id) {
 	try {
+		// remove workout from user
+		const user = userService.getByWorkoutId(id)
+		user.workouts = user.workouts.filter(({ _id }) => _id !== id)
+		await userService.update(user)
+
+		// remove workout from workout collection
 		const collection = await dbService.getCollection('workout')
 		await collection.deleteOne({ _id: ObjectId(id) })
 	} catch (err) {
@@ -82,7 +80,16 @@ async function update(workout) {
 			_id: ObjectId(workout._id),
 			name: workout.name,
 			exercises: workout.exercises,
+			userId: workout.userId,
 		}
+		// update workout in user
+		const user = await userService.getById(workoutToSave.userId)
+		user.workouts = user.workouts.map(workout =>
+			workout._id === workoutToSave._id ? workoutToSave : workout
+		)
+		await userService.update(user)
+
+		// update workout in workout collection
 		const collection = await dbService.getCollection('workout')
 		await collection.updateOne({ _id: workoutToSave._id }, { $set: workoutToSave })
 		return workoutToSave
@@ -96,7 +103,14 @@ async function add(workout) {
 		const workoutToAdd = {
 			name: workout.name,
 			exercises: workout.exercises || [],
+			userId: ObjectId(workout.userId),
 		}
+		// add workout to user's workouts
+		const user = await userService.getById(workoutToAdd.userId)
+		user.workouts.push(workoutToAdd)
+		await userService.update(user)
+
+		// add workout to workout collection
 		const collection = await dbService.getCollection('workout')
 		await collection.insertOne(workout)
 		return workoutToAdd

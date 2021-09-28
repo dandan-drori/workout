@@ -2,7 +2,6 @@ const workoutService = require('./workout.service')
 
 module.exports = {
 	getCurrentWorkout,
-	getNextWorkout,
 	moveToNextWorkout,
 	getAllWorkouts,
 	getWorkoutById,
@@ -12,7 +11,8 @@ module.exports = {
 
 async function getCurrentWorkout(req, res) {
 	try {
-		const currWorkout = await workoutService.getCurrent()
+		const { user } = req.session
+		const currWorkout = await workoutService.getCurrent(user._id)
 		res.send(currWorkout)
 	} catch (err) {
 		console.log(err)
@@ -20,13 +20,9 @@ async function getCurrentWorkout(req, res) {
 	}
 }
 
-function getNextWorkout(req, res) {
-	res.send(workoutService.getNext())
-}
-
 async function moveToNextWorkout(req, res) {
 	try {
-		await workoutService.moveToNext()
+		await workoutService.moveToNext(req.body)
 		res.send('moved to next workout')
 	} catch (err) {
 		console.log(err)
